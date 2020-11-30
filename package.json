@@ -1,5 +1,5 @@
 {
-	"name": "figma-plugin-react-template",
+	"name": "figma-boilerplate-react",
 	"version": "1.0.0",
 	"description": "This plugin template uses Typescript. If you are familiar with Javascript, Typescript will look very familiar. In fact, valid Javascript code is already valid Typescript code.",
 	"license": "ISC",
@@ -10,7 +10,8 @@
 	},
 	"dependencies": {
 		"react": "^16.13.1",
-		"react-dom": "^16.13.1"
+		"react-dom": "^16.13.1",
+		"react-figma-plugin-ds": "^2.0.5"
 	},
 	"devDependencies": {
 		"@figma/plugin-typings": "^1.16.1",

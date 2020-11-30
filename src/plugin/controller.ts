@@ -1,26 +1,24 @@
-figma.showUI(__html__);
+figma.showUI(__html__, {
+    height: 250,
+});
 
-figma.ui.onmessage = (msg) => {
-    if (msg.type === 'create-rectangles') {
-        const nodes = [];
+figma.loadFontAsync({family: 'Roboto', style: 'Regular'});
 
-        for (let i = 0; i < msg.count; i++) {
-            const rect = figma.createRectangle();
-            rect.x = i * 150;
-            rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-            figma.currentPage.appendChild(rect);
-            nodes.push(rect);
-        }
-
-        figma.currentPage.selection = nodes;
-        figma.viewport.scrollAndZoomIntoView(nodes);
-
-        // This is how figma responds back to the ui
-        figma.ui.postMessage({
-            type: 'create-rectangles',
-            message: `Created ${msg.count} Rectangles`,
-        });
+figma.ui.onmessage = msg => {
+    switch (msg.type) {
+        case 'message1':
+            //Enter your fimga API code here!!
+            break;
+        case 'message2':
+            //Enter your fimga API code here!!
+            break;
+        case 'message3':
+            //Enter your fimga API code here!!
+            break;
+        default:
+            break;
     }
 
-    figma.closePlugin();
+    // figma.closePlugin();
+    // Uncomment the line above if you want the plugin to close after running a single message call
 };

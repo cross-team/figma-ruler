@@ -1,46 +1,33 @@
 import * as React from 'react';
+import {Text} from 'react-figma-plugin-ds';
 import '../styles/ui.css';
+import 'react-figma-plugin-ds/figma-plugin-ds.css';
 
 declare function require(path: string): any;
 
 const App = ({}) => {
-    const textbox = React.useRef<HTMLInputElement>(undefined);
-
-    const countRef = React.useCallback((element: HTMLInputElement) => {
-        if (element) element.value = '5';
-        textbox.current = element;
-    }, []);
-
-    const onCreate = React.useCallback(() => {
-        const count = parseInt(textbox.current.value, 10);
-        parent.postMessage({pluginMessage: {type: 'create-rectangles', count}}, '*');
-    }, []);
-
-    const onCancel = React.useCallback(() => {
-        parent.postMessage({pluginMessage: {type: 'cancel'}}, '*');
-    }, []);
-
     React.useEffect(() => {
         // This is how we read messages sent from the plugin controller
-        window.onmessage = (event) => {
-            const { type, message } = event.data.pluginMessage;
-            if (type === 'create-rectangles') {
-                console.log(`Figma Says: ${message}`);
-            };
-        }
+        window.onmessage = event => {
+            const {type, message} = event.data.pluginMessage;
+            console.log(type, message);
+        };
     }, []);
 
+    // call launchControllerFunctions('message1') to launch the message1 command in src/plugin/controller.ts
+    function launchControllerFunctions(messageType) {
+        parent.postMessage({pluginMessage: {type: messageType}}, '*');
+    }
+
     return (
-        <div>
-            <img src={require('../assets/logo.svg')} />
-            <h2>Rectangle Creator</h2>
-            <p>
-                Count: <input ref={countRef} />
-            </p>
-            <button id="create" onClick={onCreate}>
-                Create
-            </button>
-            <button onClick={onCancel}>Cancel</button>
+        <div id="root">
+            <Text size="xlarge" weight="bold">
+                Welcome to your figma plugin!
+            </Text>
+            <Text size="large" weight="normal">
+                Check out <a href="https://github.com/alexandrtovmach/react-figma-plugin-ds/">react-figma-plugin-ds</a>{' '}
+                on gitHub to learn about the available components!
+            </Text>
         </div>
     );
 };
