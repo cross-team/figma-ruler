@@ -1,26 +1,133 @@
-figma.showUI(__html__);
+figma.showUI(__html__, {
+    height: 250,
+});
 
-figma.ui.onmessage = (msg) => {
-    if (msg.type === 'create-rectangles') {
-        const nodes = [];
+figma.loadFontAsync({family: 'Roboto', style: 'Regular'});
 
-        for (let i = 0; i < msg.count; i++) {
-            const rect = figma.createRectangle();
-            rect.x = i * 150;
-            rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-            figma.currentPage.appendChild(rect);
-            nodes.push(rect);
-        }
-
-        figma.currentPage.selection = nodes;
-        figma.viewport.scrollAndZoomIntoView(nodes);
-
-        // This is how figma responds back to the ui
-        figma.ui.postMessage({
-            type: 'create-rectangles',
-            message: `Created ${msg.count} Rectangles`,
-        });
+figma.ui.onmessage = msg => {
+    switch (msg.type) {
+        case 'create-ruler':
+            let Xruler = createRuler(msg.state, 'x', figma.currentPage.selection[0]);
+            let Yruler = createRuler(msg.state, 'y', figma.currentPage.selection[0]);
+            let Xticks = createNumbers(Xruler);
+            let Yticks = createNumbers(Yruler);
+            figma.currentPage.appendChild(Xruler);
+            figma.currentPage.appendChild(Yruler);
+            figma.currentPage.appendChild(Xticks);
+            figma.currentPage.appendChild(Yticks);
+            figma.currentPage.selection = [Xruler, Yruler];
+            break;
+        default:
+            break;
     }
 
-    figma.closePlugin();
+    // figma.closePlugin();
 };
+
+function createRuler(state, axis: 'x' | 'y', parent: SceneNode = undefined): FrameNode {
+    const rulerFrame = figma.createFrame();
+    const {opacity, color} = state;
+    const gutter: number = +state.gutter;
+    const mark: number = +state.mark;
+    const offset: number = +state.offset;
+    const ruler: number = +state.ruler;
+    let count;
+    if (parent === undefined) {
+        if (axis === 'x') {
+            count = Math.round(figma.viewport.bounds.width / gutter);
+        } else {
+            count = Math.round(figma.viewport.bounds.height / gutter);
+        }
+    } else {
+        if (axis === 'x') {
+            count = Math.round(parent.width / gutter);
+        } else {
+            count = Math.round(parent.height / gutter);
+        }
+    }
+    const grid: LayoutGrid = {
+        pattern: axis === 'x' ? 'COLUMNS' : 'ROWS',
+        color: {
+            r: color.r / 255,
+            g: color.g / 255,
+            b: color.b / 255,
+            a: opacity / 100,
+        },
+        alignment: 'MIN',
+        gutterSize: gutter,
+        count: count,
+        offset: offset,
+        sectionSize: mark,
+    };
+    const fill: SolidPaint = {
+        opacity: 0,
+        type: 'SOLID',
+        color: {
+            r: 0,
+            g: 0,
+            b: 0,
+        },
+    };
+    rulerFrame.layoutGrids = [grid];
+    rulerFrame.fills = [fill];
+    if (parent === undefined) {
+        if (axis === 'x') {
+            rulerFrame.resize(figma.viewport.bounds.width - ruler, ruler);
+            rulerFrame.x = figma.viewport.bounds.x + ruler;
+            rulerFrame.y = figma.viewport.bounds.y;
+        } else {
+            rulerFrame.resize(ruler, figma.viewport.bounds.height - ruler);
+            rulerFrame.x = figma.viewport.bounds.x;
+            rulerFrame.y = figma.viewport.bounds.y + ruler;
+        }
+    } else {
+        if (axis === 'x') {
+            rulerFrame.resize(parent.width, ruler);
+            rulerFrame.x = parent.x;
+            rulerFrame.y = parent.y - ruler;
+        } else {
+            rulerFrame.resize(ruler, parent.height);
+            rulerFrame.x = parent.x - ruler;
+            rulerFrame.y = parent.y;
+        }
+    }
+    rulerFrame.name = `${axis === 'x' ? 'X' : 'Y'} Axis`;
+    return rulerFrame;
+}
+
+function createNumbers(ruler: FrameNode): FrameNode {
+    let numberFrame = figma.createFrame();
+    let increment = ruler.layoutGrids[0]['gutterSize'] + ruler.layoutGrids[0]['sectionSize'];
+    console.log(increment);
+    console.log(ruler.layoutGrids[0]);
+    for (let index = 0; index < ruler.layoutGrids[0]['count']; index++) {
+        let text = figma.createText();
+        text.characters = `${index * increment + ruler.layoutGrids[0]['offset']}`;
+        text.fontSize = 4;
+        text.resize(increment, increment);
+        text.textAlignHorizontal = 'CENTER';
+        text.textAlignVertical = 'CENTER';
+        numberFrame.appendChild(text);
+    }
+    numberFrame.layoutMode = ruler.name[0] === 'X' ? 'HORIZONTAL' : 'VERTICAL';
+    const fill: SolidPaint = {
+        opacity: 0,
+        type: 'SOLID',
+        color: {
+            r: 0,
+            g: 0,
+            b: 0,
+        },
+    };
+    numberFrame.fills = [fill];
+    if (ruler.name[0] === 'X') {
+        numberFrame.resize(ruler.width + increment, increment);
+        numberFrame.x = ruler.x - increment / 2 + ruler.layoutGrids[0]['offset'];
+        numberFrame.y = ruler.y - increment;
+    } else {
+        numberFrame.resize(increment, ruler.height + increment);
+        numberFrame.x = ruler.x - increment;
+        numberFrame.y = ruler.y - increment / 2 + ruler.layoutGrids[0]['offset'];
+    }
+    return numberFrame;
+}
