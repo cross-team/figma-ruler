@@ -1,9 +1,22 @@
 import * as React from 'react';
-import {Input, Label} from 'react-figma-plugin-ds';
+import {Button, Input, Label, Text} from 'react-figma-plugin-ds';
+import GithubIcon from '../assets/github';
 import '../styles/ui.css';
 import 'react-figma-plugin-ds/figma-plugin-ds.css';
 
 declare function require(path: string): any;
+
+onmessage = event => {
+    let button = document.querySelector('button');
+    console.log(event.data.pluginMessage.length);
+    if (event.data.pluginMessage.length !== 0) {
+        console.log('Enabling button');
+        button.removeAttribute('disabled');
+    } else {
+        console.log('Disabling button');
+        button.setAttribute('disabled', '');
+    }
+};
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -25,126 +38,114 @@ function rgbToHex(r, g, b) {
     return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
+const defaultState = {
+    ruler: 10,
+    mark: 1,
+    gutter: 9,
+    offset: 0,
+    opacity: 50,
+    color: {
+        r: 255,
+        g: 0,
+        b: 255,
+    },
+};
+
 const App = ({}) => {
-    const [state, setState] = React.useState({
-        ruler: 20,
-        mark: 1,
-        gutter: 9,
-        offset: 0,
-        opacity: 100,
-        color: {
-            r: 255,
-            g: 0,
-            b: 255,
-        },
-    });
-    React.useEffect(() => {
-        // This is how we read messages sent from the plugin controller
-        window.onmessage = event => {
-            const {type, message} = event.data.pluginMessage;
-            if (type === 'create-rectangles') {
-                console.log(`Figma Says: ${message}`);
-            }
-        };
-    }, []);
+    const [state, setState] = React.useState(defaultState);
 
     function handleClick() {
         parent.postMessage({pluginMessage: {type: 'create-ruler', state}}, '*');
     }
 
-    function handleChange(e) {
+    function handleChange(e, name) {
         setState({
             ...state,
-            [e.target.name]: e.target.value,
+            [name]: +e,
         });
     }
 
     function handleColorChange(e) {
         setState({
             ...state,
-            color: hexToRgb(e.target.value),
+            color: hexToRgb(e),
         });
     }
 
     return (
-        <form className="root">
-            <div className="inputRow">
-                <div className="inputContainer">
-                    <Label htmlFor="ruler">Ruler Width</Label>
-                    <Input
-                        type="number"
-                        name="ruler"
-                        id="ruler"
-                        onChange={handleChange}
-                        defaultValue={20}
-                        value={state.ruler}
-                    />
+        <div id="root">
+            <div id="form">
+                <Text size="large" className="text">
+                    Select an object to wrap a ruler around it.
+                </Text>
+                <div className="inputRow">
+                    <div className="inputContainer">
+                        <Label htmlFor="gutter">Increment</Label>
+                        <Input
+                            type="number"
+                            name="gutter"
+                            id="gutter"
+                            onChange={e => {
+                                handleChange(e - 1, 'gutter');
+                            }}
+                            defaultValue={defaultState.gutter + 1}
+                        />
+                    </div>
+                    <div className="inputContainer">
+                        <Label htmlFor="offset">Offset</Label>
+                        <Input
+                            type="number"
+                            name="offset"
+                            id="offset"
+                            onChange={e => {
+                                handleChange(e, 'offset');
+                            }}
+                            defaultValue={defaultState.offset}
+                        />
+                    </div>
                 </div>
-                <div className="inputContainer">
-                    <Label htmlFor="mark">Mark Width</Label>
-                    <Input
-                        type="number"
-                        name="mark"
-                        id="mark"
-                        onChange={handleChange}
-                        defaultValue={1}
-                        value={state.mark}
-                    />
+                <div className="inputRow">
+                    <div id="colorContainer" className="inputContainer">
+                        <Label htmlFor="color">Color</Label>
+                        <Input
+                            className="colorInput"
+                            type="color"
+                            name="color"
+                            id="color"
+                            onChange={handleColorChange}
+                            defaultValue={rgbToHex(defaultState.color.r, defaultState.color.g, defaultState.color.b)}
+                        />
+                    </div>
+                    <div className="inputContainer">
+                        <Label htmlFor="opacity">Opacity</Label>
+                        <Input
+                            type="number"
+                            name="opacity"
+                            id="opacity"
+                            onChange={e => {
+                                handleChange(e, 'opacity');
+                            }}
+                            defaultValue={defaultState.opacity}
+                            max={100}
+                            min={0}
+                        />
+                    </div>
                 </div>
+                <Button onClick={handleClick}>Create Ruler</Button>
             </div>
-            <div className="inputRow">
-                <div className="inputContainer">
-                    <Label htmlFor="gutter">Gutter</Label>
-                    <Input
-                        type="number"
-                        name="gutter"
-                        id="gutter"
-                        onChange={handleChange}
-                        defaultValue={9}
-                        value={state.gutter}
-                    />
-                </div>
-                <div className="inputContainer">
-                    <Label htmlFor="offset">Offset</Label>
-                    <Input
-                        type="number"
-                        name="offset"
-                        id="offset"
-                        onChange={handleChange}
-                        defaultValue={0}
-                        value={state.offset}
-                    />
-                </div>
+            <div className="footer">
+                <Text>Version 1.0</Text>
+                <a
+                    className="ghLink"
+                    href="https://github.com/MarcelloPaiva/figma-component-organizer"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    <Text>Feedback / Issues</Text>
+                    <GithubIcon />
+                </a>
             </div>
-            <div className="inputRow">
-                <div className="inputContainer">
-                    <Label htmlFor="color">Color</Label>
-                    <Input
-                        className="colorInput"
-                        type="color"
-                        name="color"
-                        id="color"
-                        onChange={handleColorChange}
-                        defaultValue={rgbToHex(255, 0, 255)}
-                        value={rgbToHex(state.color.r, state.color.g, state.color.b)}
-                    />
-                </div>
-                <div className="inputContainer">
-                    <Label htmlFor="opacity">Opacity</Label>
-                    <Input
-                        type="number"
-                        name="opacity"
-                        id="opacity"
-                        onChange={handleChange}
-                        defaultValue={100}
-                        value={state.opacity}
-                        max={100}
-                        min={state.opacity}
-                    />
-                </div>
-            </div>
-            <button onClick={handleClick}>Create Ruler</button>
-        </form>
+        </div>
     );
 };
 

@@ -1,8 +1,14 @@
 figma.showUI(__html__, {
-    height: 250,
+    height: 300,
 });
 
 figma.loadFontAsync({family: 'Roboto', style: 'Regular'});
+
+figma.ui.postMessage(figma.currentPage.selection);
+
+figma.on('selectionchange', () => {
+    figma.ui.postMessage(figma.currentPage.selection);
+});
 
 figma.ui.onmessage = msg => {
     switch (msg.type) {
@@ -11,11 +17,9 @@ figma.ui.onmessage = msg => {
             let Yruler = createRuler(msg.state, 'y', figma.currentPage.selection[0]);
             let Xticks = createNumbers(Xruler);
             let Yticks = createNumbers(Yruler);
-            figma.currentPage.appendChild(Xruler);
-            figma.currentPage.appendChild(Yruler);
-            figma.currentPage.appendChild(Xticks);
-            figma.currentPage.appendChild(Yticks);
-            figma.currentPage.selection = [Xruler, Yruler];
+            let group = figma.group([Xruler, Yruler, Xticks, Yticks], figma.currentPage);
+
+            figma.currentPage.selection = [group];
             break;
         default:
             break;
@@ -24,11 +28,7 @@ figma.ui.onmessage = msg => {
 
 function createRuler(state, axis: 'x' | 'y', parent: SceneNode = undefined): FrameNode {
     const rulerFrame = figma.createFrame();
-    const {opacity, color} = state;
-    const gutter: number = +state.gutter;
-    const mark: number = +state.mark;
-    const offset: number = +state.offset;
-    const ruler: number = +state.ruler;
+    const {opacity, color, gutter, mark, offset, ruler} = state;
     let count;
     if (parent === undefined) {
         if (axis === 'x') {
@@ -100,7 +100,8 @@ function createNumbers(ruler: FrameNode): FrameNode {
     console.log(ruler.layoutGrids[0]);
     for (let index = 0; index < ruler.layoutGrids[0]['count']; index++) {
         let text = figma.createText();
-        text.characters = `${index * increment + ruler.layoutGrids[0]['offset']}`;
+
+        text.characters = `${index * increment}`;
         text.fontSize = 4;
         text.resize(increment, increment);
         text.textAlignHorizontal = 'CENTER';
@@ -119,11 +120,11 @@ function createNumbers(ruler: FrameNode): FrameNode {
     };
     numberFrame.fills = [fill];
     if (ruler.name[0] === 'X') {
-        numberFrame.resize(ruler.width + increment, increment);
+        numberFrame.resize(ruler.width + increment / 2 - ruler.layoutGrids[0]['offset'], increment);
         numberFrame.x = ruler.x - increment / 2 + ruler.layoutGrids[0]['offset'];
         numberFrame.y = ruler.y - increment;
     } else {
-        numberFrame.resize(increment, ruler.height + increment);
+        numberFrame.resize(increment, ruler.height + increment / 2 - ruler.layoutGrids[0]['offset']);
         numberFrame.x = ruler.x - increment;
         numberFrame.y = ruler.y - increment / 2 + ruler.layoutGrids[0]['offset'];
     }
