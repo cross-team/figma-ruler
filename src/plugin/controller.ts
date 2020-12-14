@@ -20,8 +20,6 @@ figma.ui.onmessage = msg => {
         default:
             break;
     }
-
-    // figma.closePlugin();
 };
 
 function createRuler(state, axis: 'x' | 'y', parent: SceneNode = undefined): FrameNode {
