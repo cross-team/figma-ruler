@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Input, Label, Text} from 'react-figma-plugin-ds';
+import {Button, Input, Label, Select, Text} from 'react-figma-plugin-ds';
 import GithubIcon from '../assets/github';
 import '../styles/ui.css';
 import 'react-figma-plugin-ds/figma-plugin-ds.css';
@@ -7,7 +7,7 @@ import 'react-figma-plugin-ds/figma-plugin-ds.css';
 declare function require(path: string): any;
 
 onmessage = event => {
-    let button = document.querySelector('button');
+    let button = document.querySelector('.submitButton');
     console.log(event.data.pluginMessage.length);
     if (event.data.pluginMessage.length !== 0) {
         console.log('Enabling button');
@@ -65,6 +65,14 @@ const App = ({}) => {
         });
     }
 
+    function handleSelectChange(event, name) {
+        console.log(event);
+        setState({
+            ...state,
+            [name]: event.value,
+        });
+    }
+
     function handleColorChange(e) {
         setState({
             ...state,
@@ -81,14 +89,17 @@ const App = ({}) => {
                 <div className="inputRow">
                     <div className="inputContainer">
                         <Label htmlFor="gutter">Increment</Label>
-                        <Input
-                            type="number"
+                        <Select
                             name="gutter"
                             id="gutter"
                             onChange={e => {
-                                handleChange(e - 1, 'gutter');
+                                handleSelectChange(e, 'gutter');
                             }}
-                            defaultValue={defaultState.gutter + 1}
+                            options={[
+                                {value: 9, label: '10'},
+                                {value: 7, label: '8'},
+                            ]}
+                            defaultValue={defaultState.gutter}
                         />
                     </div>
                     <div className="inputContainer">
@@ -131,7 +142,9 @@ const App = ({}) => {
                         />
                     </div>
                 </div>
-                <Button onClick={handleClick}>Create Ruler</Button>
+                <Button className="submitButton" onClick={handleClick}>
+                    Create Ruler
+                </Button>
             </div>
             <div className="footer">
                 <Text>Version 1.0</Text>

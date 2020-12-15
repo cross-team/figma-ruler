@@ -103,7 +103,7 @@ function createNumbers(state, ruler: FrameNode): FrameNode {
         let text = figma.createText();
 
         text.characters = `${index * increment}`;
-        text.fontSize = 4;
+        text.fontSize = 3;
         text.resize(increment, increment);
         text.textAlignHorizontal = 'CENTER';
         text.textAlignVertical = 'CENTER';
