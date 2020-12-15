@@ -2,6 +2,8 @@
 
 Tidy Ruler is a Figma plugin that can wrap your figma layers in a configurable ruler with accurate pixel measurements
 
+![](plugin-promotional-banner.png)
+
 ## Getting Started
 
 When you first open the plugin, you are presented with a set of pre-defined parameters that can be used as-is to show you what is possible. 
