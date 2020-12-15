@@ -15,8 +15,8 @@ figma.ui.onmessage = msg => {
         case 'create-ruler':
             let Xruler = createRuler(msg.state, 'x', figma.currentPage.selection[0]);
             let Yruler = createRuler(msg.state, 'y', figma.currentPage.selection[0]);
-            let Xticks = createNumbers(Xruler);
-            let Yticks = createNumbers(Yruler);
+            let Xticks = createNumbers(msg.state, Xruler);
+            let Yticks = createNumbers(msg.state, Yruler);
             let group = figma.group([Xruler, Yruler, Xticks, Yticks], figma.currentPage);
 
             figma.currentPage.selection = [group];
@@ -93,7 +93,8 @@ function createRuler(state, axis: 'x' | 'y', parent: SceneNode = undefined): Fra
     return rulerFrame;
 }
 
-function createNumbers(ruler: FrameNode): FrameNode {
+function createNumbers(state, ruler: FrameNode): FrameNode {
+    const {opacity, color} = state;
     let numberFrame = figma.createFrame();
     let increment = ruler.layoutGrids[0]['gutterSize'] + ruler.layoutGrids[0]['sectionSize'];
     console.log(increment);
@@ -106,6 +107,17 @@ function createNumbers(ruler: FrameNode): FrameNode {
         text.resize(increment, increment);
         text.textAlignHorizontal = 'CENTER';
         text.textAlignVertical = 'CENTER';
+        text.fills = [
+            {
+                opacity: opacity / 100,
+                type: 'SOLID',
+                color: {
+                    r: color.r / 255,
+                    g: color.g / 255,
+                    b: color.b / 255,
+                },
+            },
+        ];
         numberFrame.appendChild(text);
     }
     numberFrame.layoutMode = ruler.name[0] === 'X' ? 'HORIZONTAL' : 'VERTICAL';
