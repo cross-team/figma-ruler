@@ -1,21 +1,30 @@
-# Figma Plugin React Template
+# Tidy Ruler
 
-![62862431-71537f00-bd0e-11e9-85db-d97c0fb729a4](https://user-images.githubusercontent.com/16322616/62862692-46b5f600-bd0f-11e9-93b0-75955d1de8f3.png)
+Tidy Ruler is a Figma plugin that can wrap your figma layers in a configurable ruler with accurate pixel measurements
 
+## Getting Started
 
-This template contains the react example as shown on [Figma Docs](https://www.figma.com/plugin-docs/intro/), with some structural changes and extra tooling.
+When you first open the plugin, you are presented with a set of pre-defined parameters that can be used as-is to show you what is possible. 
 
-## Quickstart
-* Run `yarn` to install dependencies.
-* Run `yarn build:watch` to start webpack in watch mode.
-* Open `Figma` -> `Plugins` -> `Development` -> `New Plugin...` and choose `manifest.json` file from this repo.
+## Options
 
-⭐ To change the UI of your plugin (the react code), start editing [App.tsx](./src/app/components/App.tsx).  
-⭐ To interact with the Figma API edit [controller.ts](./src/plugin/controller.ts).  
-⭐ Read more on the [Figma API Overview](https://www.figma.com/plugin-docs/api/api-overview/).
+| Parameter | Description | Value |
+|----------|-------------|------|
+| `Increment` | The increment of each ruler mark in pixels. | 8, 10 |
+| `Offset` | The hierarchy levels in which your components will be organized. | Number in pixels that you want the ruler to be offset from the top left corner of the layer. |
+| `Color` | Color of ruler. | HTML Color Picker |
+| `Opacity` | Opacity of ruler. | 0-100 |
 
-## Toolings
-This repo is using:
-* React + Webpack
-* TypeScript
-* Prettier precommit hook
+## Found a bug or have an idea?
+
+This is a team of **one**, but if you have any good ideas or constructive feedback, please do not hesitate to share your thoughts [by creating a new issue](https://github.com/cross-team/figma-ruler/issues/new) - screen captures are welcomed.
+
+## Show your support
+
+If you find this plugin useful, feel free to [buy me a 🍺](https://www.patreon.com/mpaiva) at my Patreon page. Thanks! 🙏
+ 
+## Contribute
+- Run `yarn` to install dependencies.
+- Run `yarn build:watch` to start webpack in watch mode.
+- Open `Figma` > `Plugins` > `Development` > `New Plugin...` and choose manifest.json file from this repo.
+- Create a Pull Request for your branch
