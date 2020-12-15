@@ -74,3 +74,8 @@ input:focus {
 .text {
     margin: 0 16px 16px 16px;
 }
+
+.colorInput {
+    padding: 2px 4px !important;
+    /* width: 28px !important; */
+}
