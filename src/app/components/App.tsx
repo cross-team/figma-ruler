@@ -84,7 +84,7 @@ const App = ({}) => {
         <div id="root">
             <div id="form">
                 <Text size="large" className="text">
-                    Select an object to wrap a ruler around it.
+                    Select a layer to wrap a ruler around it.
                 </Text>
                 <div className="inputRow">
                     <div className="inputContainer">
